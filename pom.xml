@@ -77,7 +77,6 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-joda</artifactId>
             <version>2.7.3</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

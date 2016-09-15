@@ -59,12 +59,7 @@ public class BenchmarkToCompareKeyTypes {
             }
         }
 
-        String JSON = null;
-        try {
-            JSON = new ObjectMapper().writeValueAsString(getMapWithTexts(15));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        String JSON = "{\"1\":\"textForLanguageId-1\",\"2\":\"textForLanguageId-2\",\"3\":\"textForLanguageId-3\",\"4\":\"textForLanguageId-4\",\"5\":\"textForLanguageId-5\",\"6\":\"textForLanguageId-6\",\"7\":\"textForLanguageId-7\",\"8\":\"textForLanguageId-8\",\"9\":\"textForLanguageId-9\",\"10\":\"textForLanguageId-10\",\"11\":\"textForLanguageId-11\",\"12\":\"textForLanguageId-12\"}";
 
         map1mBigStringKeyJSON = ChronicleMap
                 .of(String.class, String.class)
@@ -160,7 +155,7 @@ public class BenchmarkToCompareKeyTypes {
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithFullStringKeyJSON() {
         HashMap<String, String> result = new HashMap<>();
-        int languageId = random.nextInt(15);
+        int languageId = random.nextInt(12);
         for(int i = 0; i < 1000; i++) {
             String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
             String jsonString = map1mBigStringKeyJSON.get(key);
@@ -187,13 +182,4 @@ public class BenchmarkToCompareKeyTypes {
                 .forEach(e -> result.put(e.getKey(), e.getValue()));
         return result;
     }
-
-    private HashMap<Integer, String> getMapWithTexts(int amount) {
-        HashMap<Integer, String> map = new HashMap<>();
-        for (int i = 1; i <= amount; i++) {
-            map.put(i, "textForLanguageId-" + i);
-        }
-        return map;
-    }
-
 }
