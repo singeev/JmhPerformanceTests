@@ -62,7 +62,7 @@ public class BenchmarkToCompareKeyTypes {
 
         for (int i = 0; i < elementsNumber/1000; i++) {
             for(int j = 0; j < 1000; j++) {//to make keys with duplicate value of a 1st parameter
-                String key = "pid" + i + ":cid" + j + ":ct" + i + 1 + ":lid" + j + 1;
+                String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
                 String value = VALUE + i;
                 map1mBigStringKey.put(key, value);
             }
@@ -92,6 +92,7 @@ public class BenchmarkToCompareKeyTypes {
                 .stream()
                 .filter(e -> e.getKey().startsWith(String.valueOf(random.nextInt(1000))))
                 .forEach(e -> result.put(e.getKey(), e.getValue()));
+        System.out.println("Retrieved " + result.size() + " values.");
         return result;
     }
 
@@ -103,6 +104,7 @@ public class BenchmarkToCompareKeyTypes {
                 .stream()
                 .filter(e -> e.getKey().contains(String.valueOf(random.nextInt(1000))))
                 .forEach(e -> result.put(e.getKey(), e.getValue()));
+        System.out.println("Retrieved " + result.size() + " values.");
         return result;
     }
 
@@ -114,6 +116,19 @@ public class BenchmarkToCompareKeyTypes {
                 .stream()
                 .filter(e -> e.getKey().contains(String.valueOf("pid" + random.nextInt(1000))))
                 .forEach(e -> result.put(e.getKey(), e.getValue()));
+        System.out.println("Retrieved " + result.size() + " values.");
+        return result;
+    }
+
+    @Benchmark
+    @Fork(1)
+    public HashMap<String, String> testGet1000ElementsWithFullStringKey() {
+        HashMap<String, String> result = new HashMap<>();
+        for(int i = 0; i < 1000; i++) {//to make keys with duplicate value of a 1st parameter
+            String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
+            result.get(key);
+        }
+        System.out.println("Retrieved " + result.size() + " values.");
         return result;
     }
 
@@ -125,6 +140,7 @@ public class BenchmarkToCompareKeyTypes {
                 .stream()
                 .filter(e -> ByteBuffer.wrap(e.getKey()).getInt(0) == random.nextInt(1000))
                 .forEach(e -> result.put(e.getKey(), e.getValue()));
+        System.out.println("Retrieved " + result.size() + " values.");
         return result;
     }
 
