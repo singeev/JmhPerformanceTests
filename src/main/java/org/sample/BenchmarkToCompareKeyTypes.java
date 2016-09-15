@@ -34,30 +34,30 @@ public class BenchmarkToCompareKeyTypes {
 
     Random random = new Random();
 
-//    private ChronicleMap<String, String> map1mStringKey;
-//    private ChronicleMap<String, String> map1mBigStringKey;
+    private ChronicleMap<String, String> map1mStringKey;
+    private ChronicleMap<String, String> map1mBigStringKey;
     private ChronicleMap<String, String> map1mBigStringKeyJSON;
-//    private ChronicleMap<byte[], String> map1mByteArrayKey;
+    private ChronicleMap<byte[], String> map1mByteArrayKey;
 
     @Setup
     public void setup(BenchmarkParams params) {
         System.out.println();
         System.out.println("Elements: " + elementsNumber);
 
-//        map1mStringKey = ChronicleMap
-//                .of(String.class, String.class)
-//                .averageKey("15648:keykeykeykeykeykeykeykeykeykeykeykeykeykeykey")
-//                .averageValue(VALUE)
-//                .entries(elementsNumber)
-//                .create();
-//
-//        for (int i = 0; i < elementsNumber/1000; i++) {
-//            for(int j = 0; j < 1000; j++) {//to make keys with duplicate value of a 1st parameter
-//                String key = j + ":" + KEY;
-//                String value = VALUE + i;
-//                map1mStringKey.put(key, value);
-//            }
-//        }
+        map1mStringKey = ChronicleMap
+                .of(String.class, String.class)
+                .averageKey("15648:keykeykeykeykeykeykeykeykeykeykeykeykeykeykey")
+                .averageValue(VALUE)
+                .entries(elementsNumber)
+                .create();
+
+        for (int i = 0; i < elementsNumber/1000; i++) {
+            for(int j = 0; j < 1000; j++) {//to make keys with duplicate value of a 1st parameter
+                String key = j + ":" + KEY;
+                String value = VALUE + i;
+                map1mStringKey.put(key, value);
+            }
+        }
 
         String JSON = "{\"1\":\"textForLanguageId-1\",\"2\":\"textForLanguageId-2\",\"3\":\"textForLanguageId-3\",\"4\":\"textForLanguageId-4\",\"5\":\"textForLanguageId-5\",\"6\":\"textForLanguageId-6\",\"7\":\"textForLanguageId-7\",\"8\":\"textForLanguageId-8\",\"9\":\"textForLanguageId-9\",\"10\":\"textForLanguageId-10\",\"11\":\"textForLanguageId-11\",\"12\":\"textForLanguageId-12\"}";
 
@@ -75,69 +75,69 @@ public class BenchmarkToCompareKeyTypes {
             }
         }
 
-//        map1mBigStringKey = ChronicleMap
-//                .of(String.class, String.class)
-//                .averageKey("pid15648:cid1298754:ct34:lid1")
-//                .averageValue(VALUE)
-//                .entries(elementsNumber)
-//                .create();
-//
-//        for (int i = 0; i < elementsNumber/1000; i++) {
-//            for(int j = 0; j < 1000; j++) {//to make keys with duplicate value of a 1st parameter
-//                String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
-//                String value = VALUE + i;
-//                map1mBigStringKey.put(key, value);
-//            }
-//        }
-//
-//        map1mByteArrayKey = ChronicleMap
-//                .of(byte[].class, String.class)
-//                .averageKey(AVERAGE_BYTE_ARRAY_KEY)
-//                .averageValue(VALUE)
-//                .entries(elementsNumber)
-//                .create();
-//
-//        for (int i = 0; i < elementsNumber/1000; i++) {
-//            for(int j = 0; j < 1000; j++) {
-//                byte[] key = ByteBuffer.allocate(12).putInt(0, i).putInt(4, j).putInt(8, j + i).array(); //to make keys with duplicate value of a 2nd parameter
-//                String value = VALUE + i;
-//                map1mByteArrayKey.put(key, value);
-//            }
-//        }
+        map1mBigStringKey = ChronicleMap
+                .of(String.class, String.class)
+                .averageKey("pid15648:cid1298754:ct34:lid1")
+                .averageValue(VALUE)
+                .entries(elementsNumber)
+                .create();
+
+        for (int i = 0; i < elementsNumber/1000; i++) {
+            for(int j = 0; j < 1000; j++) {//to make keys with duplicate value of a 1st parameter
+                String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
+                String value = VALUE + i;
+                map1mBigStringKey.put(key, value);
+            }
+        }
+
+        map1mByteArrayKey = ChronicleMap
+                .of(byte[].class, String.class)
+                .averageKey(AVERAGE_BYTE_ARRAY_KEY)
+                .averageValue(VALUE)
+                .entries(elementsNumber)
+                .create();
+
+        for (int i = 0; i < elementsNumber/1000; i++) {
+            for(int j = 0; j < 1000; j++) {
+                byte[] key = ByteBuffer.allocate(12).putInt(0, i).putInt(4, j).putInt(8, j + i).array(); //to make keys with duplicate value of a 2nd parameter
+                String value = VALUE + i;
+                map1mByteArrayKey.put(key, value);
+            }
+        }
     }
 
-//    @Benchmark
-//    @Fork(1)
-//    public HashMap<String, String> testGet1000ElementsWithStringKey1() {
-//        HashMap<String, String> result = new HashMap<>();
-//        map1mStringKey.entrySet()
-//                .stream()
-//                .filter(e -> e.getKey().startsWith(String.valueOf(random.nextInt(1000))))
-//                .forEach(e -> result.put(e.getKey(), e.getValue()));
-//        return result;
-//    }
+    @Benchmark
+    @Fork(1)
+    public HashMap<String, String> testGet1000ElementsWithStringKey1() {
+        HashMap<String, String> result = new HashMap<>();
+        map1mStringKey.entrySet()
+                .stream()
+                .filter(e -> e.getKey().startsWith(String.valueOf(random.nextInt(1000))))
+                .forEach(e -> result.put(e.getKey(), e.getValue()));
+        return result;
+    }
 
-//    @Benchmark
-//    @Fork(1)
-//    public HashMap<String, String> testGet1000ElementsWithStringKey2() {
-//        HashMap<String, String> result = new HashMap<>();
-//        map1mStringKey.entrySet()
-//                .stream()
-//                .filter(e -> e.getKey().contains(String.valueOf(random.nextInt(1000))))
-//                .forEach(e -> result.put(e.getKey(), e.getValue()));
-//        return result;
-//    }
+    @Benchmark
+    @Fork(1)
+    public HashMap<String, String> testGet1000ElementsWithStringKey2() {
+        HashMap<String, String> result = new HashMap<>();
+        map1mStringKey.entrySet()
+                .stream()
+                .filter(e -> e.getKey().contains(String.valueOf(random.nextInt(1000))))
+                .forEach(e -> result.put(e.getKey(), e.getValue()));
+        return result;
+    }
 
-//    @Benchmark
-//    @Fork(1)
-//    public HashMap<String, String> testGet1000ElementsWithBigStringKey() {
-//        HashMap<String, String> result = new HashMap<>();
-//        map1mStringKey.entrySet()
-//                .stream()
-//                .filter(e -> e.getKey().contains(String.valueOf("pid" + random.nextInt(1000))))
-//                .forEach(e -> result.put(e.getKey(), e.getValue()));
-//        return result;
-//    }
+    @Benchmark
+    @Fork(1)
+    public HashMap<String, String> testGet1000ElementsWithBigStringKey() {
+        HashMap<String, String> result = new HashMap<>();
+        map1mStringKey.entrySet()
+                .stream()
+                .filter(e -> e.getKey().contains(String.valueOf("pid" + random.nextInt(1000))))
+                .forEach(e -> result.put(e.getKey(), e.getValue()));
+        return result;
+    }
 
     @Benchmark
     @Fork(1)
@@ -171,14 +171,14 @@ public class BenchmarkToCompareKeyTypes {
         return result;
     }
 
-//    @Benchmark
-//    @Fork(1)
-//    public HashMap<byte[], String> testGet1000ElementsWithByteArrayKey() {
-//        HashMap<byte[], String> result = new HashMap<>();
-//        map1mByteArrayKey.entrySet()
-//                .stream()
-//                .filter(e -> ByteBuffer.wrap(e.getKey()).getInt(0) == random.nextInt(1000))
-//                .forEach(e -> result.put(e.getKey(), e.getValue()));
-//        return result;
-//    }
+    @Benchmark
+    @Fork(1)
+    public HashMap<byte[], String> testGet1000ElementsWithByteArrayKey() {
+        HashMap<byte[], String> result = new HashMap<>();
+        map1mByteArrayKey.entrySet()
+                .stream()
+                .filter(e -> ByteBuffer.wrap(e.getKey()).getInt(0) == random.nextInt(1000))
+                .forEach(e -> result.put(e.getKey(), e.getValue()));
+        return result;
+    }
 }
