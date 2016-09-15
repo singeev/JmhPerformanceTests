@@ -48,7 +48,7 @@ public class BenchmarkWrite {
     @Param({"1000", "100000", "1000000"})
     public int elementsNumber = 1000;
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public void testFillUpChronicle() {
         ChronicleMap<String, String> allSystemTexts = ChronicleMap
@@ -67,7 +67,7 @@ public class BenchmarkWrite {
         allSystemTexts.close();
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public HashMap testHashMap() {
         HashMap<String, String> allSystemTexts = new HashMap<>(elementsNumber);

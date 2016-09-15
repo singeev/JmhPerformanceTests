@@ -44,7 +44,7 @@ public class BenchmarkRead {
         }
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public String testRead() {
         return allSystemTexts10m.get(KEY + random.nextInt(elementsNumber));
