@@ -1,11 +1,16 @@
 package org.sample;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.openhft.chronicle.map.ChronicleMap;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.BenchmarkParams;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -31,6 +36,7 @@ public class BenchmarkToCompareKeyTypes {
 
     private ChronicleMap<String, String> map1mStringKey;
     private ChronicleMap<String, String> map1mBigStringKey;
+    private ChronicleMap<String, String> map1mBigStringKeyJSON;
     private ChronicleMap<byte[], String> map1mByteArrayKey;
 
     @Setup
@@ -50,6 +56,28 @@ public class BenchmarkToCompareKeyTypes {
                 String key = j + ":" + KEY;
                 String value = VALUE + i;
                 map1mStringKey.put(key, value);
+            }
+        }
+
+        String JSON = null;
+        try {
+            JSON = new ObjectMapper().writeValueAsString(getMapWithTexts(15));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        map1mBigStringKeyJSON = ChronicleMap
+                .of(String.class, String.class)
+                .averageKey("pid15648:cid1298754:ct34:lid1")
+                .averageValue(JSON)
+                .entries(elementsNumber)
+                .create();
+
+        for (int i = 0; i < elementsNumber/1000; i++) {
+            for(int j = 0; j < 1000; j++) {//to make keys with duplicate value of a 1st parameter
+                String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
+                String value = JSON;
+                map1mBigStringKey.put(key, value);
             }
         }
 
@@ -84,7 +112,7 @@ public class BenchmarkToCompareKeyTypes {
         }
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithStringKey1() {
         HashMap<String, String> result = new HashMap<>();
@@ -95,7 +123,7 @@ public class BenchmarkToCompareKeyTypes {
         return result;
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithStringKey2() {
         HashMap<String, String> result = new HashMap<>();
@@ -106,7 +134,7 @@ public class BenchmarkToCompareKeyTypes {
         return result;
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithBigStringKey() {
         HashMap<String, String> result = new HashMap<>();
@@ -123,12 +151,33 @@ public class BenchmarkToCompareKeyTypes {
         HashMap<String, String> result = new HashMap<>();
         for(int i = 0; i < 1000; i++) {//to make keys with duplicate value of a 1st parameter
             String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
-            result.get(key);
+            result.put(key,map1mBigStringKey.get(key));
         }
         return result;
     }
 
     @Benchmark
+    @Fork(1)
+    public HashMap<String, String> testGet1000ElementsWithFullStringKeyJSON() {
+        HashMap<String, String> result = new HashMap<>();
+        int languageId = random.nextInt(15);
+        for(int i = 0; i < 1000; i++) {
+            String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
+            String jsonString = map1mBigStringKeyJSON.get(key);
+            Map<Integer, String> mapFromJson = null;
+            try {
+                mapFromJson = new ObjectMapper().readValue(
+                        jsonString, new TypeReference<HashMap<Integer, String>>() {
+                        });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            result.put(key,mapFromJson.get(languageId));
+        }
+        return result;
+    }
+
+//    @Benchmark
     @Fork(1)
     public HashMap<byte[], String> testGet1000ElementsWithByteArrayKey() {
         HashMap<byte[], String> result = new HashMap<>();
@@ -137,6 +186,14 @@ public class BenchmarkToCompareKeyTypes {
                 .filter(e -> ByteBuffer.wrap(e.getKey()).getInt(0) == random.nextInt(1000))
                 .forEach(e -> result.put(e.getKey(), e.getValue()));
         return result;
+    }
+
+    private HashMap<Integer, String> getMapWithTexts(int amount) {
+        HashMap<Integer, String> map = new HashMap<>();
+        for (int i = 1; i <= amount; i++) {
+            map.put(i, "textForLanguageId-" + i);
+        }
+        return map;
     }
 
 }
