@@ -30,6 +30,7 @@ public class BenchmarkToCompareKeyTypes {
     Random random = new Random();
 
     private ChronicleMap<String, String> map1mStringKey;
+    private ChronicleMap<String, String> map1mBigStringKey;
     private ChronicleMap<byte[], String> map1mByteArrayKey;
 
     @Setup
@@ -49,6 +50,21 @@ public class BenchmarkToCompareKeyTypes {
                 String key = j + ":" + KEY;
                 String value = VALUE + i;
                 map1mStringKey.put(key, value);
+            }
+        }
+
+        map1mBigStringKey = ChronicleMap
+                .of(String.class, String.class)
+                .averageKey("pid15648:cid1298754:ct34:lid1")
+                .averageValue(VALUE)
+                .entries(elementsNumber)
+                .create();
+
+        for (int i = 0; i < elementsNumber/1000; i++) {
+            for(int j = 0; j < 1000; j++) {//to make keys with duplicate value of a 1st parameter
+                String key = "pid" + i + ":cid" + j + ":ct" + i + 1 + ":lid" + j + 1;
+                String value = VALUE + i;
+                map1mBigStringKey.put(key, value);
             }
         }
 
@@ -86,6 +102,17 @@ public class BenchmarkToCompareKeyTypes {
         map1mStringKey.entrySet()
                 .stream()
                 .filter(e -> e.getKey().contains(String.valueOf(random.nextInt(1000))))
+                .forEach(e -> result.put(e.getKey(), e.getValue()));
+        return result;
+    }
+
+    @Benchmark
+    @Fork(1)
+    public HashMap<String, String> testGet1000ElementsWithBigStringKey() {
+        HashMap<String, String> result = new HashMap<>();
+        map1mStringKey.entrySet()
+                .stream()
+                .filter(e -> e.getKey().contains(String.valueOf("pid" + random.nextInt(1000))))
                 .forEach(e -> result.put(e.getKey(), e.getValue()));
         return result;
     }
