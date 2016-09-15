@@ -92,7 +92,6 @@ public class BenchmarkToCompareKeyTypes {
                 .stream()
                 .filter(e -> e.getKey().startsWith(String.valueOf(random.nextInt(1000))))
                 .forEach(e -> result.put(e.getKey(), e.getValue()));
-        System.out.println("Retrieved " + result.size() + " values.");
         return result;
     }
 
@@ -104,7 +103,6 @@ public class BenchmarkToCompareKeyTypes {
                 .stream()
                 .filter(e -> e.getKey().contains(String.valueOf(random.nextInt(1000))))
                 .forEach(e -> result.put(e.getKey(), e.getValue()));
-        System.out.println("Retrieved " + result.size() + " values.");
         return result;
     }
 
@@ -116,7 +114,6 @@ public class BenchmarkToCompareKeyTypes {
                 .stream()
                 .filter(e -> e.getKey().contains(String.valueOf("pid" + random.nextInt(1000))))
                 .forEach(e -> result.put(e.getKey(), e.getValue()));
-        System.out.println("Retrieved " + result.size() + " values.");
         return result;
     }
 
@@ -128,7 +125,6 @@ public class BenchmarkToCompareKeyTypes {
             String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
             result.get(key);
         }
-        System.out.println("Retrieved " + result.size() + " values.");
         return result;
     }
 
@@ -140,7 +136,6 @@ public class BenchmarkToCompareKeyTypes {
                 .stream()
                 .filter(e -> ByteBuffer.wrap(e.getKey()).getInt(0) == random.nextInt(1000))
                 .forEach(e -> result.put(e.getKey(), e.getValue()));
-        System.out.println("Retrieved " + result.size() + " values.");
         return result;
     }
 
