@@ -44,36 +44,36 @@ public class BenchmarkToCompareKeyTypes {
         System.out.println();
         System.out.println("Elements: " + elementsNumber);
 
-        map1mStringKey = ChronicleMap
-                .of(String.class, String.class)
-                .averageKey("15648:keykeykeykeykeykeykeykeykeykeykeykeykeykeykey")
-                .averageValue(VALUE)
-                .entries(elementsNumber)
-                .create();
-
-        for (int i = 0; i < elementsNumber/1000; i++) {
-            for(int j = 0; j < 1000; j++) {//to make keys with duplicate value of a 1st parameter
-                String key = j + ":" + KEY;
-                String value = VALUE + i;
-                map1mStringKey.put(key, value);
-            }
-        }
-
-        String JSON = "{\"1\":\"textForLanguageId-1\",\"2\":\"textForLanguageId-2\",\"3\":\"textForLanguageId-3\",\"4\":\"textForLanguageId-4\",\"5\":\"textForLanguageId-5\",\"6\":\"textForLanguageId-6\",\"7\":\"textForLanguageId-7\",\"8\":\"textForLanguageId-8\",\"9\":\"textForLanguageId-9\",\"10\":\"textForLanguageId-10\",\"11\":\"textForLanguageId-11\",\"12\":\"textForLanguageId-12\"}";
-
-        map1mBigStringKeyJSON = ChronicleMap
-                .of(String.class, String.class)
-                .averageKey("pid15648:cid1298754:ct34:lid1")
-                .averageValue(JSON)
-                .entries(elementsNumber)
-                .create();
-
-        for (int i = 0; i < elementsNumber/1000; i++) {
-            for(int j = 0; j < 1000; j++) {//to make keys with duplicate value of a 1st parameter
-                String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
-                map1mBigStringKeyJSON.put(key, JSON);
-            }
-        }
+//        map1mStringKey = ChronicleMap
+//                .of(String.class, String.class)
+//                .averageKey("15648:keykeykeykeykeykeykeykeykeykeykeykeykeykeykey")
+//                .averageValue(VALUE)
+//                .entries(elementsNumber)
+//                .create();
+//
+//        for (int i = 0; i < elementsNumber/1000; i++) {
+//            for(int j = 0; j < 1000; j++) {//to make keys with duplicate value of a 1st parameter
+//                String key = j + ":" + KEY;
+//                String value = VALUE + i;
+//                map1mStringKey.put(key, value);
+//            }
+//        }
+//
+//        String JSON = "{\"1\":\"textForLanguageId-1\",\"2\":\"textForLanguageId-2\",\"3\":\"textForLanguageId-3\",\"4\":\"textForLanguageId-4\",\"5\":\"textForLanguageId-5\",\"6\":\"textForLanguageId-6\",\"7\":\"textForLanguageId-7\",\"8\":\"textForLanguageId-8\",\"9\":\"textForLanguageId-9\",\"10\":\"textForLanguageId-10\",\"11\":\"textForLanguageId-11\",\"12\":\"textForLanguageId-12\"}";
+//
+//        map1mBigStringKeyJSON = ChronicleMap
+//                .of(String.class, String.class)
+//                .averageKey("pid15648:cid1298754:ct34:lid1")
+//                .averageValue(JSON)
+//                .entries(elementsNumber)
+//                .create();
+//
+//        for (int i = 0; i < elementsNumber/1000; i++) {
+//            for(int j = 0; j < 1000; j++) {//to make keys with duplicate value of a 1st parameter
+//                String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
+//                map1mBigStringKeyJSON.put(key, JSON);
+//            }
+//        }
 
         map1mBigStringKey = ChronicleMap
                 .of(String.class, String.class)
@@ -89,6 +89,7 @@ public class BenchmarkToCompareKeyTypes {
                 map1mBigStringKey.put(key, value);
             }
         }
+        System.out.println("Filled CronicleMap with " + map1mBigStringKey.size() + " elements (String key).");
 
         map1mByteArrayKey = ChronicleMap
                 .of(byte[].class, String.class)
@@ -104,9 +105,10 @@ public class BenchmarkToCompareKeyTypes {
                 map1mByteArrayKey.put(key, value);
             }
         }
+        System.out.println("Filled CronicleMap with " + map1mByteArrayKey.size() + " elements (byte[] key).");
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithStringKey1() {
         HashMap<String, String> result = new HashMap<>();
@@ -117,7 +119,7 @@ public class BenchmarkToCompareKeyTypes {
         return result;
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithStringKey2() {
         HashMap<String, String> result = new HashMap<>();
@@ -128,7 +130,7 @@ public class BenchmarkToCompareKeyTypes {
         return result;
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithBigStringKey() {
         HashMap<String, String> result = new HashMap<>();
@@ -147,10 +149,11 @@ public class BenchmarkToCompareKeyTypes {
             String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
             result.put(key,map1mBigStringKeyJSON.get(key));
         }
+        System.out.println("Got " + result.size() + " elements by String key.");
         return result;
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithFullStringKeyJSON() {
         HashMap<String, String> result = new HashMap<>();
@@ -179,6 +182,7 @@ public class BenchmarkToCompareKeyTypes {
                 .stream()
                 .filter(e -> ByteBuffer.wrap(e.getKey()).getInt(0) == random.nextInt(1000))
                 .forEach(e -> result.put(e.getKey(), e.getValue()));
+        System.out.println("Got " + result.size() + " elements by byte[] key.");
         return result;
     }
 }
