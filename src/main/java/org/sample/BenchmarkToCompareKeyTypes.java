@@ -73,7 +73,6 @@ public class BenchmarkToCompareKeyTypes {
             String key = "pid" + i + ":cid" + i + 1 + ":ct" + i + 2 + ":lid" + i + 3;
             result.put(key, map1mBigStringKey.get(key));
         }
-        System.out.println("Got " + result.size() + " elements by String key.");
         return result;
     }
 
@@ -85,7 +84,6 @@ public class BenchmarkToCompareKeyTypes {
             byte[] key = ByteBuffer.allocate(12).putInt(0, i).putInt(4, i + 1).putInt(8, i + 2).array();
             result.put(key, map1mByteArrayKey.get(key));
         }
-        System.out.println("Got " + result.size() + " elements by byte[] key.");
         return result;
     }
 }
