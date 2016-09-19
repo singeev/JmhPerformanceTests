@@ -67,6 +67,7 @@ public class BenchmarkToCompareKeyTypes {
         }
         System.out.println("Filled CronicleMap with " + map1mByteArrayKey.size() + " elements (byte[] key).");
 
+        hashMap1mByteArrayKey = new HashMap<>();
         for (int i = 0; i < elementsNumber; i++) {
             byte[] key = ByteBuffer.allocate(12).putInt(0, i).putInt(4, i + 1).putInt(8, i + 2).array();
             String value = VALUE + i;
