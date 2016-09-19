@@ -82,12 +82,10 @@ public class BenchmarkToCompareKeyTypes {
                 .entries(elementsNumber)
                 .create();
 
-        for (int i = 0; i < elementsNumber/1000; i++) {
-            for(int j = 0; j < 1000; j++) {//to make keys with duplicate value of a 1st parameter
-                String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
+        for (int i = 0; i < elementsNumber; i++) {
+                String key = "pid" + i + ":cid" + i + 1 + ":ct" + i + 2 + ":lid" + i + 3;
                 String value = VALUE + i;
                 map1mBigStringKey.put(key, value);
-            }
         }
         System.out.println("Filled CronicleMap with " + map1mBigStringKey.size() + " elements (String key).");
 
@@ -98,12 +96,10 @@ public class BenchmarkToCompareKeyTypes {
                 .entries(elementsNumber)
                 .create();
 
-        for (int i = 0; i < elementsNumber/1000; i++) {
-            for(int j = 0; j < 1000; j++) {
-                byte[] key = ByteBuffer.allocate(12).putInt(0, i).putInt(4, j).putInt(8, j + i).array(); //to make keys with duplicate value of a 2nd parameter
+        for (int i = 0; i < elementsNumber; i++) {
+                byte[] key = ByteBuffer.allocate(12).putInt(0, i).putInt(4, i + 1).putInt(8, i + 2).array(); //to make keys with duplicate value of a 2nd parameter
                 String value = VALUE + i;
                 map1mByteArrayKey.put(key, value);
-            }
         }
         System.out.println("Filled CronicleMap with " + map1mByteArrayKey.size() + " elements (byte[] key).");
     }
@@ -146,8 +142,8 @@ public class BenchmarkToCompareKeyTypes {
     public HashMap<String, String> testGet1000ElementsWithFullStringKey() {
         HashMap<String, String> result = new HashMap<>();
         for(int i = 0; i < 1000; i++) {//to make keys with duplicate value of a 1st parameter
-            String key = "pid" + i + ":cid" + i + ":ct" + i + 1 + ":lid" + i + 1;
-            result.put(key,map1mBigStringKeyJSON.get(key));
+            String key = "pid" + i + ":cid" + i + 1 + ":ct" + i + 2 + ":lid" + i + 3;
+            result.put(key,map1mBigStringKey.get(key));
         }
         System.out.println("Got " + result.size() + " elements by String key.");
         return result;
@@ -178,10 +174,10 @@ public class BenchmarkToCompareKeyTypes {
     @Fork(1)
     public HashMap<byte[], String> testGet1000ElementsWithByteArrayKey() {
         HashMap<byte[], String> result = new HashMap<>();
-        map1mByteArrayKey.entrySet()
-                .stream()
-                .filter(e -> ByteBuffer.wrap(e.getKey()).getInt(0) == random.nextInt(1000))
-                .forEach(e -> result.put(e.getKey(), e.getValue()));
+        for(int i = 0; i < 1000; i++) {//to make keys with duplicate value of a 1st parameter
+            byte[] key = ByteBuffer.allocate(12).putInt(0, i).putInt(4, i + 1).putInt(8, i + 2).array();
+            result.put(key, map1mBigStringKey.get(key));
+        }
         System.out.println("Got " + result.size() + " elements by byte[] key.");
         return result;
     }
