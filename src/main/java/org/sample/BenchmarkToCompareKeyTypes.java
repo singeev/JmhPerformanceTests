@@ -78,11 +78,39 @@ public class BenchmarkToCompareKeyTypes {
 
     @Benchmark
     @Fork(1)
-    public HashMap<byte[], String> testGet1000ElementsWithByteArrayKey() {
+    public HashMap<byte[], String> testGet1000ElementsWithFullByteArrayKey() {
         HashMap<byte[], String> result = new HashMap<>();
         for(int i = 0; i < 1000; i++) {
             byte[] key = ByteBuffer.allocate(12).putInt(0, i).putInt(4, i + 1).putInt(8, i + 2).array();
             result.put(key, map1mByteArrayKey.get(key));
+        }
+        return result;
+    }
+
+    @Benchmark
+    @Fork(1)
+    public HashMap<String, String> testGet1000ElementsWithPartStringKey() {
+        HashMap<String, String> result = new HashMap<>();
+        for(int i = 1000; i > 0; i--) {
+            for(String key : map1mBigStringKey.keySet()){
+                if(key.contains("pid" + i)){
+                    result.put(key, map1mBigStringKey.get(key));
+                }
+            }
+        }
+        return result;
+    }
+
+    @Benchmark
+    @Fork(1)
+    public HashMap<byte[], String> testGet1000ElementsWithPartByteArrayKey() {
+        HashMap<byte[], String> result = new HashMap<>();
+        for(int i = 1000; i > 0; i--) {
+            for(byte[] key : map1mByteArrayKey.keySet()){
+                if(ByteBuffer.wrap(key).getInt(0) == i){
+                    result.put(key, map1mBigStringKey.get(key));
+                }
+            }
         }
         return result;
     }
