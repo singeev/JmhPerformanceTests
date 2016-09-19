@@ -30,6 +30,7 @@ public class BenchmarkToCompareKeyTypes {
     Random random = new Random();
 
     private ChronicleMap<byte[], String> map1mByteArrayKey;
+    private HashMap<byte[], String> hashMap1mByteArrayKey;
     private ChronicleMap<String, String> map1mBigStringKey;
     private ChronicleMap<ContentTextKey, String> map1mObjKey;
 
@@ -65,6 +66,13 @@ public class BenchmarkToCompareKeyTypes {
                 map1mByteArrayKey.put(key, value);
         }
         System.out.println("Filled CronicleMap with " + map1mByteArrayKey.size() + " elements (byte[] key).");
+
+        for (int i = 0; i < elementsNumber; i++) {
+            byte[] key = ByteBuffer.allocate(12).putInt(0, i).putInt(4, i + 1).putInt(8, i + 2).array();
+            String value = VALUE + i;
+            hashMap1mByteArrayKey.put(key, value);
+        }
+        System.out.println("Filled HashMap with " + hashMap1mByteArrayKey.size() + " elements (byte[] key).");
 
         map1mObjKey = ChronicleMap
                 .of(ContentTextKey.class, String.class)
@@ -111,6 +119,17 @@ public class BenchmarkToCompareKeyTypes {
 
     @Benchmark
     @Fork(1)
+    public HashMap<byte[], String> testGet1000ElementsWithFullByteArrayKeyHashMap() {
+        HashMap<byte[], String> result = new HashMap<>();
+        for(int i = 0; i < 1000; i++) {
+            byte[] key = ByteBuffer.allocate(12).putInt(0, i).putInt(4, i + 1).putInt(8, i + 2).array();
+            result.put(key, hashMap1mByteArrayKey.get(key));
+        }
+        return result;
+    }
+
+    @Benchmark
+    @Fork(1)
     public HashMap<ContentTextKey, String> testGet1000ElementsWithObjKey() {
         HashMap<ContentTextKey, String> result = new HashMap<>();
         for(int i = 0; i < 1000; i++) {
@@ -150,6 +169,18 @@ public class BenchmarkToCompareKeyTypes {
 
     @Benchmark
     @Fork(1)
+    public String testGet1000ElementsWithPartByteArrayKeyHashMap() {
+        String result = null;
+        for (byte[] key : hashMap1mByteArrayKey.keySet()) {
+            if (ByteBuffer.wrap(key).getInt(0) == randomIndex) {
+                result = hashMap1mByteArrayKey.get(key);
+            }
+        }
+        return result;
+    }
+
+    @Benchmark
+    @Fork(1)
     public String testGet1000ElementsWithPartObjKey() {
         String result = null;
         for (ContentTextKey key : map1mObjKey.keySet()) {
@@ -164,12 +195,12 @@ public class BenchmarkToCompareKeyTypes {
 class ContentTextKey implements Serializable {
     int componentId;
     int componentType;
-    int languegeId;
+    int languageId;
 
     public ContentTextKey(int componentId, int componentType, int languegeId) {
         this.componentId = componentId;
         this.componentType = componentType;
-        this.languegeId = languegeId;
+        this.languageId = languegeId;
     }
 
     public int getComponentId() {
@@ -188,12 +219,12 @@ class ContentTextKey implements Serializable {
         this.componentType = componentType;
     }
 
-    public int getLanguegeId() {
-        return languegeId;
+    public int getLanguageId() {
+        return languageId;
     }
 
-    public void setLanguegeId(int languegeId) {
-        this.languegeId = languegeId;
+    public void setLanguageId(int languageId) {
+        this.languageId = languageId;
     }
 
     @Override
@@ -205,7 +236,7 @@ class ContentTextKey implements Serializable {
 
         if (componentId != that.componentId) return false;
         if (componentType != that.componentType) return false;
-        return languegeId == that.languegeId;
+        return languageId == that.languageId;
 
     }
 
@@ -213,7 +244,7 @@ class ContentTextKey implements Serializable {
     public int hashCode() {
         int result = componentId;
         result = 31 * result + componentType;
-        result = 31 * result + languegeId;
+        result = 31 * result + languageId;
         return result;
     }
 }
