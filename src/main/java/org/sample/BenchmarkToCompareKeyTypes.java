@@ -1,9 +1,11 @@
 package org.sample;
 
+import com.sun.tools.doclets.internal.toolkit.Content;
 import net.openhft.chronicle.map.ChronicleMap;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.BenchmarkParams;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Random;
@@ -21,6 +23,7 @@ public class BenchmarkToCompareKeyTypes {
     private static final String VALUE = "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongvalue";
 
     private static final byte[] AVERAGE_BYTE_ARRAY_KEY = ByteBuffer.allocate(12).putInt(0, 2102).putInt(4, 256987).putInt(8, 25).array();
+    private static final ContentTextKey AVERAGE_OBJ_KEY = new ContentTextKey(256987, 25, 1);
 
 //    @Param({"10000", "100000", "1000000"})
     @Param({"1000000"})
@@ -30,6 +33,7 @@ public class BenchmarkToCompareKeyTypes {
 
     private ChronicleMap<String, String> map1mBigStringKey;
     private ChronicleMap<byte[], String> map1mByteArrayKey;
+    private ChronicleMap<ContentTextKey, String> map1mObjKey;
 
     @Setup
     public void setup(BenchmarkParams params) {
@@ -63,9 +67,23 @@ public class BenchmarkToCompareKeyTypes {
                 map1mByteArrayKey.put(key, value);
         }
         System.out.println("Filled CronicleMap with " + map1mByteArrayKey.size() + " elements (byte[] key).");
+
+        map1mObjKey = ChronicleMap
+                .of(ContentTextKey.class, String.class)
+                .averageKey(AVERAGE_OBJ_KEY)
+                .averageValue(VALUE)
+                .entries(elementsNumber)
+                .create();
+
+        for (int i = 0; i < elementsNumber; i++) {
+            ContentTextKey key = new ContentTextKey(i, i + 1, i + 2);
+            String value = VALUE + i;
+            map1mObjKey.put(key, value);
+        }
+        System.out.println("Filled CronicleMap with " + map1mObjKey.size() + " elements (Obj key).");
     }
 
-//    @Benchmark
+    @Benchmark
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithFullStringKey() {
         HashMap<String, String> result = new HashMap<>();
@@ -76,7 +94,7 @@ public class BenchmarkToCompareKeyTypes {
         return result;
     }
 
-//    @Benchmark
+    @Benchmark
     @Fork(1)
     public HashMap<byte[], String> testGet1000ElementsWithFullByteArrayKey() {
         HashMap<byte[], String> result = new HashMap<>();
@@ -88,6 +106,17 @@ public class BenchmarkToCompareKeyTypes {
     }
 
     @Benchmark
+    @Fork(1)
+    public HashMap<ContentTextKey, String> testGet1000ElementsWithObjKey() {
+        HashMap<ContentTextKey, String> result = new HashMap<>();
+        for(int i = 0; i < 1000; i++) {
+            ContentTextKey key = new ContentTextKey(i, i + 1, i + 2);
+            result.put(key, map1mObjKey.get(key));
+        }
+        return result;
+    }
+
+//    @Benchmark
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithPartStringKey() {
         HashMap<String, String> result = new HashMap<>();
@@ -115,7 +144,7 @@ public class BenchmarkToCompareKeyTypes {
         return result;
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public HashMap<byte[], String> testGet1000ElementsWithPartByteArrayKeyStream() {
         HashMap<byte[], String> result = new HashMap<>();
@@ -126,6 +155,63 @@ public class BenchmarkToCompareKeyTypes {
                     .filter(e -> ByteBuffer.wrap(e.getKey()).getInt(0) == finalI)
                     .forEach(e -> result.put(e.getKey(), e.getValue()));
         }
+        return result;
+    }
+}
+
+class ContentTextKey implements Serializable {
+    int componentId;
+    int componentType;
+    int languegeId;
+
+    public ContentTextKey(int componentId, int componentType, int languegeId) {
+        this.componentId = componentId;
+        this.componentType = componentType;
+        this.languegeId = languegeId;
+    }
+
+    public int getComponentId() {
+        return componentId;
+    }
+
+    public void setComponentId(int componentId) {
+        this.componentId = componentId;
+    }
+
+    public int getComponentType() {
+        return componentType;
+    }
+
+    public void setComponentType(int componentType) {
+        this.componentType = componentType;
+    }
+
+    public int getLanguegeId() {
+        return languegeId;
+    }
+
+    public void setLanguegeId(int languegeId) {
+        this.languegeId = languegeId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ContentTextKey)) return false;
+
+        ContentTextKey that = (ContentTextKey) o;
+
+        if (componentId != that.componentId) return false;
+        if (componentType != that.componentType) return false;
+        return languegeId == that.languegeId;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = componentId;
+        result = 31 * result + componentType;
+        result = 31 * result + languegeId;
         return result;
     }
 }
