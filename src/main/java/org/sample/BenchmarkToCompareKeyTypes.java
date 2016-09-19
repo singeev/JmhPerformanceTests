@@ -1,6 +1,5 @@
 package org.sample;
 
-import com.sun.tools.doclets.internal.toolkit.Content;
 import net.openhft.chronicle.map.ChronicleMap;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.BenchmarkParams;
@@ -20,21 +19,18 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 public class BenchmarkToCompareKeyTypes {
 
-    private static final String VALUE = "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongvalue";
-
     private static final byte[] AVERAGE_BYTE_ARRAY_KEY = ByteBuffer.allocate(12).putInt(0, 2102).putInt(4, 256987).putInt(8, 25).array();
     private static final ContentTextKey AVERAGE_OBJ_KEY = new ContentTextKey(256987, 25, 1);
+    private static final String VALUE = "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongvalue";
     private static int randomIndex;
 
-//    @Param({"10000", "100000", "1000000"})
     @Param({"1000000"})
     public int elementsNumber;
 
     Random random = new Random();
 
-
-    private ChronicleMap<String, String> map1mBigStringKey;
     private ChronicleMap<byte[], String> map1mByteArrayKey;
+    private ChronicleMap<String, String> map1mBigStringKey;
     private ChronicleMap<ContentTextKey, String> map1mObjKey;
 
     @Setup
@@ -87,6 +83,10 @@ public class BenchmarkToCompareKeyTypes {
         randomIndex = random.nextInt();
     }
 
+    /*--------------------------------------------------------------
+      бенчмарки для выборки 1000 элементов из мэпы по ПОЛНОМУ ключу
+     --------------------------------------------------------------*/
+
     @Benchmark
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithFullStringKey() {
@@ -120,6 +120,10 @@ public class BenchmarkToCompareKeyTypes {
         return result;
     }
 
+    /*--------------------------------------------------------------
+      бенчмарки для выборки 1 элемента из мэпы по НЕ полному ключу
+     --------------------------------------------------------------*/
+
     @Benchmark
     @Fork(1)
     public String testGet1000ElementsWithPartStringKey() {
@@ -142,17 +146,6 @@ public class BenchmarkToCompareKeyTypes {
             }
         }
         return result;
-    }
-
-    @Benchmark
-    @Fork(1)
-    public String testGet1000ElementsWithPartByteArrayKeyStream() {
-        return map1mByteArrayKey.entrySet()
-                .stream()
-                .filter(e -> ByteBuffer.wrap(e.getKey()).getInt(0) == randomIndex)
-                .findFirst()
-                .get()
-                .getValue();
     }
 
     @Benchmark
