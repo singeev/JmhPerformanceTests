@@ -65,7 +65,7 @@ public class BenchmarkToCompareKeyTypes {
         System.out.println("Filled CronicleMap with " + map1mByteArrayKey.size() + " elements (byte[] key).");
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithFullStringKey() {
         HashMap<String, String> result = new HashMap<>();
@@ -76,7 +76,7 @@ public class BenchmarkToCompareKeyTypes {
         return result;
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public HashMap<byte[], String> testGet1000ElementsWithFullByteArrayKey() {
         HashMap<byte[], String> result = new HashMap<>();
@@ -91,7 +91,7 @@ public class BenchmarkToCompareKeyTypes {
     @Fork(1)
     public HashMap<String, String> testGet1000ElementsWithPartStringKey() {
         HashMap<String, String> result = new HashMap<>();
-        for(int i = 1000; i > 0; i--) {
+        for(int i = 0; i < 1000; i++) {
             for(String key : map1mBigStringKey.keySet()){
                 if(key.contains("pid" + i)){
                     result.put(key, map1mBigStringKey.get(key));
@@ -105,10 +105,10 @@ public class BenchmarkToCompareKeyTypes {
     @Fork(1)
     public HashMap<byte[], String> testGet1000ElementsWithPartByteArrayKey() {
         HashMap<byte[], String> result = new HashMap<>();
-        for(int i = 1000; i > 0; i--) {
+        for(int i = 0; i < 1000; i++) {
             for(byte[] key : map1mByteArrayKey.keySet()){
                 if(ByteBuffer.wrap(key).getInt(0) == i){
-                    result.put(key, map1mBigStringKey.get(key));
+                    result.put(key, map1mByteArrayKey.get(key));
                 }
             }
         }
