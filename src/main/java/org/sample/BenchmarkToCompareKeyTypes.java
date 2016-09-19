@@ -58,7 +58,7 @@ public class BenchmarkToCompareKeyTypes {
                 .create();
 
         for (int i = 0; i < elementsNumber; i++) {
-                byte[] key = ByteBuffer.allocate(12).putInt(0, i).putInt(4, i + 1).putInt(8, i + 2).array(); //to make keys with duplicate value of a 2nd parameter
+                byte[] key = ByteBuffer.allocate(12).putInt(0, i).putInt(4, i + 1).putInt(8, i + 2).array();
                 String value = VALUE + i;
                 map1mByteArrayKey.put(key, value);
         }
@@ -101,7 +101,7 @@ public class BenchmarkToCompareKeyTypes {
         return result;
     }
 
-    @Benchmark
+//    @Benchmark
     @Fork(1)
     public HashMap<byte[], String> testGet1000ElementsWithPartByteArrayKey() {
         HashMap<byte[], String> result = new HashMap<>();
@@ -111,6 +111,20 @@ public class BenchmarkToCompareKeyTypes {
                     result.put(key, map1mByteArrayKey.get(key));
                 }
             }
+        }
+        return result;
+    }
+
+    @Benchmark
+    @Fork(1)
+    public HashMap<byte[], String> testGet1000ElementsWithPartByteArrayKeyStream() {
+        HashMap<byte[], String> result = new HashMap<>();
+        for(int i = 0; i < 1000; i++) {
+            int finalI = i;
+            map1mByteArrayKey.entrySet()
+                    .stream()
+                    .filter(e -> ByteBuffer.wrap(e.getKey()).getInt(0) == finalI)
+                    .forEach(e -> result.put(e.getKey(), e.getValue()));
         }
         return result;
     }
