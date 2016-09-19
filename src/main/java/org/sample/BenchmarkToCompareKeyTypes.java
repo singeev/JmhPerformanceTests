@@ -24,12 +24,14 @@ public class BenchmarkToCompareKeyTypes {
 
     private static final byte[] AVERAGE_BYTE_ARRAY_KEY = ByteBuffer.allocate(12).putInt(0, 2102).putInt(4, 256987).putInt(8, 25).array();
     private static final ContentTextKey AVERAGE_OBJ_KEY = new ContentTextKey(256987, 25, 1);
+    private static int randomIndex;
 
 //    @Param({"10000", "100000", "1000000"})
     @Param({"1000000"})
     public int elementsNumber;
 
     Random random = new Random();
+
 
     private ChronicleMap<String, String> map1mBigStringKey;
     private ChronicleMap<byte[], String> map1mByteArrayKey;
@@ -81,6 +83,8 @@ public class BenchmarkToCompareKeyTypes {
             map1mObjKey.put(key, value);
         }
         System.out.println("Filled CronicleMap with " + map1mObjKey.size() + " elements (Obj key).");
+
+        randomIndex = random.nextInt();
     }
 
     @Benchmark
@@ -116,44 +120,49 @@ public class BenchmarkToCompareKeyTypes {
         return result;
     }
 
-//    @Benchmark
+    @Benchmark
     @Fork(1)
-    public HashMap<String, String> testGet1000ElementsWithPartStringKey() {
-        HashMap<String, String> result = new HashMap<>();
-        for(int i = 0; i < 1000; i++) {
+    public String testGet1000ElementsWithPartStringKey() {
+       String result = null;
             for(String key : map1mBigStringKey.keySet()){
-                if(key.contains("pid" + i)){
-                    result.put(key, map1mBigStringKey.get(key));
+                if(key.contains("pid" + randomIndex)){
+                    result = map1mBigStringKey.get(key);
                 }
+            }
+        return result;
+    }
+
+    @Benchmark
+    @Fork(1)
+    public String testGet1000ElementsWithPartByteArrayKey() {
+        String result = null;
+        for (byte[] key : map1mByteArrayKey.keySet()) {
+            if (ByteBuffer.wrap(key).getInt(0) == randomIndex) {
+                result = map1mByteArrayKey.get(key);
             }
         }
         return result;
     }
 
-//    @Benchmark
+    @Benchmark
     @Fork(1)
-    public HashMap<byte[], String> testGet1000ElementsWithPartByteArrayKey() {
-        HashMap<byte[], String> result = new HashMap<>();
-        for(int i = 0; i < 1000; i++) {
-            for(byte[] key : map1mByteArrayKey.keySet()){
-                if(ByteBuffer.wrap(key).getInt(0) == i){
-                    result.put(key, map1mByteArrayKey.get(key));
-                }
-            }
-        }
-        return result;
+    public String testGet1000ElementsWithPartByteArrayKeyStream() {
+        return map1mByteArrayKey.entrySet()
+                .stream()
+                .filter(e -> ByteBuffer.wrap(e.getKey()).getInt(0) == randomIndex)
+                .findFirst()
+                .get()
+                .getValue();
     }
 
-//    @Benchmark
+    @Benchmark
     @Fork(1)
-    public HashMap<byte[], String> testGet1000ElementsWithPartByteArrayKeyStream() {
-        HashMap<byte[], String> result = new HashMap<>();
-        for(int i = 0; i < 1000; i++) {
-            int finalI = i;
-            map1mByteArrayKey.entrySet()
-                    .stream()
-                    .filter(e -> ByteBuffer.wrap(e.getKey()).getInt(0) == finalI)
-                    .forEach(e -> result.put(e.getKey(), e.getValue()));
+    public String testGet1000ElementsWithPartObjKey() {
+        String result = null;
+        for (ContentTextKey key : map1mObjKey.keySet()) {
+            if (key.getComponentId() == randomIndex) {
+                result = map1mObjKey.get(key);
+            }
         }
         return result;
     }
